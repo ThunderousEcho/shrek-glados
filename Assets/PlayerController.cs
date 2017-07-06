@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour {
 
     float a = 0;
 
+    Vector3 lastPos;
+
     void Start() {
 
     }
@@ -32,7 +34,7 @@ public class PlayerController : MonoBehaviour {
         transform.position += mov * movementSpeed;
 
         if (mov.magnitude != 0) {
-            spriteNow ++;
+            spriteNow++;
             if (!engineRunning) {
                 engineExhaust.Play();
                 engineRunning = true;
@@ -73,5 +75,13 @@ public class PlayerController : MonoBehaviour {
         e.startRotation = Mathf.Atan2(mov.x, mov.y);
 
         //e.startRotation = Mathf.Atan2(relMousePos.x, relMousePos.y);
+
+        Vector3 screenPos = Camera.main.WorldToViewportPoint(transform.position);
+        screenPos.x = Mathf.Clamp01(screenPos.x);
+        screenPos.y = Mathf.Clamp01(screenPos.y);
+
+        Vector3 n = Camera.main.ViewportToWorldPoint(screenPos);
+        n.z = 0;
+        transform.position = n;
     }
 }

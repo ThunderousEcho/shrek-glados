@@ -6,11 +6,12 @@ public class Bullet : MonoBehaviour {
 
     public const float speed = 4;
 
-	void Start () {
-		
-	}
-	
 	void Update () {
+
+        if (World.transitionStartTime > -64) {
+            Destroy(gameObject);
+        }
+
         Vector2 f = transform.up * speed * Time.deltaTime;
 
         RaycastHit2D h = Physics2D.Raycast(transform.position, f, speed * Time.deltaTime);

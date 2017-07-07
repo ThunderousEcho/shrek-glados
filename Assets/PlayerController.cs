@@ -37,7 +37,14 @@ public class PlayerController : MonoBehaviour {
             GetComponent<Collider2D>().enabled = false;
             rend.enabled = false;
             gameOverText.SetActive(true);
+            laser.enabled = false;
+            peek.gameObject.SetActive(false);
         }
+    }
+
+    public void heal() {
+        health = 5;
+        rend.color = Color.Lerp(Color.white, Color.red, (1 - health / 5));
     }
 
     void Start() {
@@ -106,7 +113,7 @@ public class PlayerController : MonoBehaviour {
             if (World.transitionStartTime > -64)
                 peekScale = Mathf.Lerp(peekScale, 64, Time.deltaTime * 5);
             else
-                peekScale = Mathf.Lerp(peekScale, 2, Time.deltaTime * 5);
+                peekScale = Mathf.Lerp(peekScale, 5, Time.deltaTime * 5);
         } else {
             laser.enabled = false;
             peekScale = Mathf.Lerp(peekScale, 64, Time.deltaTime * 5);

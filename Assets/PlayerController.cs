@@ -19,8 +19,12 @@ public class PlayerController : MonoBehaviour {
 
     Vector3 lastPos;
 
-    void Start() {
+    int health = 5;
 
+    public void damage(int amount) {
+        health -= amount;
+        if (health < 0)
+            Destroy(gameObject);
     }
 
     void Update() {
@@ -59,8 +63,7 @@ public class PlayerController : MonoBehaviour {
             }
         }
 
-        rend.sprite = sprites[spriteNow];
-
+        //rend.sprite = sprites[spriteNow];
 
         Plane p = new Plane(transform.forward, transform.position);
         Ray r = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -78,10 +81,28 @@ public class PlayerController : MonoBehaviour {
 
         Vector3 screenPos = Camera.main.WorldToViewportPoint(transform.position);
         screenPos.x = Mathf.Clamp01(screenPos.x);
-        screenPos.y = Mathf.Clamp01(screenPos.y);
-
+        //screenPos.y = Mathf.Clamp01(screenPos.y);
         Vector3 n = Camera.main.ViewportToWorldPoint(screenPos);
         n.z = 0;
         transform.position = n;
+
+        Vector3 x = transform.position;
+        x.y = Mathf.Clamp(x.y, -5f, 5f);
+        //x.x = Mathf.Clamp(x.x, -5f * 16f / 9f, 5f * 16f / 9f);
+        x.z = 0;
+        transform.position = x;
+
+        ParticleSystem.Particle[] particles = new ParticleSystem.Particle[bullets.particleCount];
+        bullets.GetParticles(particles);
+
+        for (int i = particles.Length - 1; i >= 0; i--) {
+            Collider2D c = Physics2D.OverlapPoint(particles[i].position);
+            if (c != null) {
+                particles[i].remainingLifetime = 0; //kill
+                c.gameObject.SendMessage("damage", 1);
+            }
+        }
+
+        bullets.SetParticles(particles, particles.Length);
     }
 }

@@ -13,15 +13,20 @@ public class PlayerController : MonoBehaviour {
     public float movementSpeed;
 
     bool bulletsRunning = true;
-    public ParticleSystem bullets;
 
     float a = 0;
 
     Vector3 lastPos;
 
-    int health = 5;
+    float health = 5;
 
-    public void damage(int amount) {
+    float peekScale;
+    public Transform peek;
+
+    public LineRenderer laser;
+    Vector3[] laserPoints = new Vector3[32];
+
+    public void damage(float amount) {
         health -= amount;
         if (health < 0)
             Destroy(gameObject);
@@ -50,21 +55,6 @@ public class PlayerController : MonoBehaviour {
             }
         }
 
-        if (Input.GetButton("Fire1")) {
-            spriteNow += 2;
-            if (!bulletsRunning) {
-                bullets.Play();
-                bulletsRunning = true;
-            }
-        } else {
-            if (bulletsRunning) {
-                bullets.Stop();
-                bulletsRunning = false;
-            }
-        }
-
-        //rend.sprite = sprites[spriteNow];
-
         Plane p = new Plane(transform.forward, transform.position);
         Ray r = Camera.main.ScreenPointToRay(Input.mousePosition);
         float enter;
@@ -74,35 +64,50 @@ public class PlayerController : MonoBehaviour {
 
         transform.LookAt(transform.position + Vector3.forward, relMousePos);
 
-        var e = engineExhaust.main;
-        e.startRotation = Mathf.Atan2(mov.x, mov.y);
+        if (Input.GetButton("Fire1")) {
+            RaycastHit2D h = Physics2D.Raycast(transform.position + transform.up, transform.up);
+            if (h.collider != null) {
+                h.collider.gameObject.SendMessage("damage", Time.deltaTime);
+            }
+
+            spriteNow += 2;
+            laserPoints[0] = transform.position + transform.up * 0.75f;
+            for (int i = 1; i < laserPoints.Length; i++) {
+                if (i + 0.75f > h.distance - 1 && h.collider != null) {
+                    laserPoints[i] = transform.position + transform.up * (h.distance + 1) + (Vector3)Random.insideUnitCircle * 0.125f;
+                    continue;
+                }
+                laserPoints[i] = (transform.position + transform.up * (i + 0.75f)) + (Vector3)Random.insideUnitCircle * 0.125f;
+            }
+            laser.SetPositions(laserPoints);
+            laser.enabled = true;
+            peekScale = Mathf.Lerp(peekScale, 2, Time.deltaTime * 5);
+        } else {
+            laser.enabled = false;
+            peekScale = Mathf.Lerp(peekScale, 64, Time.deltaTime * 5);
+        }
+
+        //rend.sprite = sprites[spriteNow];
+
+        var er = engineExhaust.main;
+        er.startRotation = Mathf.Atan2(mov.x, mov.y);
 
         //e.startRotation = Mathf.Atan2(relMousePos.x, relMousePos.y);
 
-        Vector3 screenPos = Camera.main.WorldToViewportPoint(transform.position);
+        /*Vector3 screenPos = Camera.main.WorldToViewportPoint(transform.position);
         screenPos.x = Mathf.Clamp01(screenPos.x);
-        //screenPos.y = Mathf.Clamp01(screenPos.y);
+        screenPos.y = Mathf.Clamp01(screenPos.y);
         Vector3 n = Camera.main.ViewportToWorldPoint(screenPos);
-        n.z = 0;
-        transform.position = n;
+        n.z = -9;
+        transform.position = n;*/
 
         Vector3 x = transform.position;
         x.y = Mathf.Clamp(x.y, -5f, 5f);
-        //x.x = Mathf.Clamp(x.x, -5f * 16f / 9f, 5f * 16f / 9f);
-        x.z = 0;
+        x.x = Mathf.Clamp(x.x, -5f * 16f / 9f, 5f * 16f / 9f);
+        x.z = -9;
         transform.position = x;
 
-        ParticleSystem.Particle[] particles = new ParticleSystem.Particle[bullets.particleCount];
-        bullets.GetParticles(particles);
-
-        for (int i = particles.Length - 1; i >= 0; i--) {
-            Collider2D c = Physics2D.OverlapPoint(particles[i].position);
-            if (c != null) {
-                particles[i].remainingLifetime = 0; //kill
-                c.gameObject.SendMessage("damage", 1);
-            }
-        }
-
-        bullets.SetParticles(particles, particles.Length);
+        peek.localScale = peekScale * new Vector3(1, 1, 0) + Vector3.forward;
+        peek.rotation = Quaternion.identity;
     }
 }

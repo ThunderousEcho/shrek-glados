@@ -33,7 +33,6 @@ public class SineEnemy : MonoBehaviour {
         transform.position = n;
 
         if (!f) {
-            rend.color = Color.Lerp(rend.color, Color.white, Time.deltaTime * 10);
             transform.Translate(-Vector3.forward * transform.position.z);
         }
         f = false;
@@ -44,14 +43,14 @@ public class SineEnemy : MonoBehaviour {
             return;
 
         health -= amount;
-        rend.color = Color.red;
+        rend.color = Color.Lerp(Color.white, Color.red, (1-health / 3));
         f = true;
 
         if (health <= 0) {
             Vector3 t = transform.position;
             t.z = -7;
             transform.position = t; //make visible above peek
-
+            rend.color = Color.red;
             AudioSource.PlayClipAtPoint(death, Camera.main.transform.position);
             deathTimer = 0;
             GetComponent<CircleCollider2D>().enabled = false;

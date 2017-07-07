@@ -26,26 +26,42 @@ public class PlayerController : MonoBehaviour {
     public LineRenderer laser;
     Vector3[] laserPoints = new Vector3[32];
 
+    public static PlayerController main;
+
+    public GameObject gameOverText;
+
     public void damage(float amount) {
         health -= amount;
-        if (health < 0)
-            Destroy(gameObject);
+        rend.color = Color.Lerp(Color.white, Color.red, (1 - health / 5));
+        if (health <= 0) {
+            GetComponent<Collider2D>().enabled = false;
+            rend.enabled = false;
+            gameOverText.SetActive(true);
+        }
+    }
+
+    void Start() {
+        main = this;
     }
 
     void Update() {
 
+        if (health <= 0)
+            return;
+
         if (World.transitionStartTime > -64) {
-            transform.position = Vector3.Lerp(transform.position, new Vector3(-5, 0, transform.position.z), Time.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, new Vector3(-6, 0, transform.position.z), Time.deltaTime * 5);
         }
 
         int spriteNow = 0;
 
         Vector3 mov = Vector2.zero;
-        mov.x = Input.GetAxisRaw("Horizontal");
-        mov.y = Input.GetAxisRaw("Vertical");
-        mov = Vector2.ClampMagnitude(mov, 1);
-
-        transform.position += mov * movementSpeed;
+        if (World.transitionStartTime < -64) {
+            mov.x = Input.GetAxisRaw("Horizontal");
+            mov.y = Input.GetAxisRaw("Vertical");
+            mov = Vector2.ClampMagnitude(mov, 1);
+            transform.position += mov * movementSpeed;
+        }
 
         if (mov.magnitude != 0) {
             spriteNow++;
@@ -86,14 +102,15 @@ public class PlayerController : MonoBehaviour {
             }
             laser.SetPositions(laserPoints);
             laser.enabled = true;
-            peekScale = Mathf.Lerp(peekScale, 2, Time.deltaTime * 5);
+
+            if (World.transitionStartTime > -64)
+                peekScale = Mathf.Lerp(peekScale, 64, Time.deltaTime * 5);
+            else
+                peekScale = Mathf.Lerp(peekScale, 2, Time.deltaTime * 5);
         } else {
             laser.enabled = false;
             peekScale = Mathf.Lerp(peekScale, 64, Time.deltaTime * 5);
         }
-
-        if (World.transitionStartTime > -64)
-            peekScale = 64;
 
         //rend.sprite = sprites[spriteNow];
 

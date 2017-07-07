@@ -16,8 +16,15 @@ public class World : MonoBehaviour {
     int currentLevel = 0;
     Vector3 p;
 
+    public int startOnLevel;
+
     void Start() {
         main = this;
+        levels[currentLevel].SetActive(false);
+        currentLevel = startOnLevel;
+        transitionStartTime = Time.time;
+        levels[currentLevel].SetActive(true);
+        p = levels[currentLevel].transform.position;
     }
 
     void Update() {

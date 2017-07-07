@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour {
 
-    float health = 0.5f;
+    protected float maxHealth = 0.5f;
+    protected float health = 0.5f;
 
     public SpriteRenderer rend;
 
@@ -18,7 +19,7 @@ public class Enemy : MonoBehaviour {
         
     }
 	
-	void Update () {
+	public virtual void Update () {
 
         if (World.transitionStartTime > -64)
             return;
@@ -45,7 +46,7 @@ public class Enemy : MonoBehaviour {
             return;
 
         health -= amount;
-        rend.color = Color.Lerp(Color.white, Color.red, (1-health / 3));
+        rend.color = Color.Lerp(Color.white, Color.red, (1-health / maxHealth));
         f = true;
 
         if (health <= 0) {

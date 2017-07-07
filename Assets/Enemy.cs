@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SineEnemy : MonoBehaviour {
+public class Enemy : MonoBehaviour {
 
-    float health = 3;
+    float health = 0.5f;
 
     public SpriteRenderer rend;
 
@@ -14,9 +14,9 @@ public class SineEnemy : MonoBehaviour {
 
     public AudioClip death;
 
-	void Start () {
-		
-	}
+	public virtual void Start () {
+        
+    }
 	
 	void Update () {
 
@@ -27,9 +27,8 @@ public class SineEnemy : MonoBehaviour {
             return;
         }
 
-        Vector3 n = transform.position;
-        n.y = Mathf.Sin(Time.time) * 5;
-        transform.LookAt(transform.position + Vector3.forward, n + Vector3.right * Time.deltaTime - transform.position);
+        Vector3 n = getPosition(transform.position);
+        transform.LookAt(transform.position + Vector3.forward, n + Vector3.right * Time.deltaTime * World.panSpeed - transform.position);
         transform.position = n;
 
         if (!f) {
@@ -55,5 +54,9 @@ public class SineEnemy : MonoBehaviour {
             deathTimer = 0;
             GetComponent<CircleCollider2D>().enabled = false;
         }
+    }
+
+    public virtual Vector3 getPosition(Vector3 position) {
+        return position;
     }
 }

@@ -20,6 +20,9 @@ public class Enemy : MonoBehaviour {
 	
 	void Update () {
 
+        if (World.transitionStartTime > -64)
+            return;
+
         if (deathTimer > 0.0625f) {
             Destroy(gameObject);
         } else if (health <= 0) {
@@ -52,7 +55,7 @@ public class Enemy : MonoBehaviour {
             rend.color = Color.red;
             AudioSource.PlayClipAtPoint(death, Camera.main.transform.position);
             deathTimer = 0;
-            GetComponent<CircleCollider2D>().enabled = false;
+            GetComponent<Collider2D>().enabled = false;
         }
     }
 

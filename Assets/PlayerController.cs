@@ -33,6 +33,11 @@ public class PlayerController : MonoBehaviour {
     }
 
     void Update() {
+
+        if (World.transitionStartTime > -64) {
+            transform.position = Vector3.Lerp(transform.position, new Vector3(-5, 0, transform.position.z), Time.deltaTime);
+        }
+
         int spriteNow = 0;
 
         Vector3 mov = Vector2.zero;
@@ -86,6 +91,9 @@ public class PlayerController : MonoBehaviour {
             laser.enabled = false;
             peekScale = Mathf.Lerp(peekScale, 64, Time.deltaTime * 5);
         }
+
+        if (World.transitionStartTime > -64)
+            peekScale = 64;
 
         //rend.sprite = sprites[spriteNow];
 

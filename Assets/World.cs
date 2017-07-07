@@ -10,20 +10,42 @@ public class World : MonoBehaviour {
 
     public World main;
 
-    float transitionStartTime = -128;
+    public static float transitionStartTime = -128;
 
-	void Start () {
+    public GameObject[] levels;
+    int currentLevel = 0;
+    Vector3 p;
+
+    void Start() {
         main = this;
-	}
-	
-	void Update () {
+    }
+
+    void Update() {
+
+        if (levels[currentLevel].transform.childCount == 0) {
+            if (currentLevel < levels.Length -1) {
+                currentLevel++;
+                transitionStartTime = Time.time;
+                levels[currentLevel].SetActive(true);
+                p = levels[currentLevel].transform.position;
+            } else {
+                Debug.Log("You Win!");
+            }
+        }
+
         var m = stars.main;
 
         if (Time.time > transitionStartTime + 2) {
             transitionStartTime = -128;
             panSpeed = 1;
+            levels[currentLevel].transform.position = Vector3.zero;
         } else if (transitionStartTime > -64) {
             panSpeed = 1 + (1 - Mathf.Cos((Time.time - transitionStartTime) * Mathf.PI)) * 2;
+
+            if (Time.time > transitionStartTime + 1) {
+                float j = Time.time - transitionStartTime - 1;
+                levels[currentLevel].transform.position = Vector3.Lerp(levels[currentLevel].transform.position, Vector3.zero, Time.deltaTime * 10);
+            }
         }
 
         m.simulationSpeed = panSpeed * 5;
@@ -38,13 +60,5 @@ public class World : MonoBehaviour {
         if (desiredWidth > currentWidth) {
             Camera.main.orthographicSize *= desiredWidth / currentWidth;
         }
-
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            transition();
-        }
-    }
-
-    public void transition() {
-        transitionStartTime = Time.time;
     }
 }

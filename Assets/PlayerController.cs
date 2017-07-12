@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour {
 
     Vector3 lastPos;
 
-    float health = 5;
+    float health = 1;
 
     float peekScale;
     public Transform peek;
@@ -113,7 +113,7 @@ public class PlayerController : MonoBehaviour {
             if (World.transitionStartTime > -64)
                 peekScale = Mathf.Lerp(peekScale, 64, Time.deltaTime * 5);
             else
-                peekScale = Mathf.Lerp(peekScale, 5, Time.deltaTime * 5);
+                peekScale = Mathf.Lerp(peekScale, 7, Time.deltaTime * 5);
         } else {
             laser.enabled = false;
             peekScale = Mathf.Lerp(peekScale, 64, Time.deltaTime * 5);
